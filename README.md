@@ -34,7 +34,6 @@
 <span style="margin-left: 2%">journal={Journal of Visual Communication and Image Representation},</span><br>
 <span style="margin-left: 2%">pages={103635}</span><br>
 <span style="margin-left: 2%">year={2022}</span><br>
-
 	}
 </div>
 
@@ -47,13 +46,14 @@ This program is free software: it is distributed WITHOUT ANY WARRANTY.
 If you are using this software, please cite:
 
 Battiato, Sebastiano and Giudice, Oliver and Guarnera, Francesco and Puglisi, Giovanni:
-“Computational data analysis for first quantization estimation on JPEG double compressed images",
-In Proceedings of the International Conference on Pattern Recognition, 2021
+“CNN-based first quantization estimation of double compressed JPEG images",
+Journal of Visual Communication and Image Representation, 2022
     
 The software estimates the first 15 quantization factors (in zig-zag order) of an aligned Double compressed JPEG image.
 
-Given the double JPEG compressed image <b>I</b>, the software read the second quantization matrix <b>Q2</b> from <b>I</b> and it simulate all possible double compressions 
-employing a constant matrix for each value between 1 and <b>max</b> (set inside the file v1.py) for the first compression and <b>Q2</b> for the second one.
+Given the double JPEG compressed image <b>I</b>, the software read the second quantization matrix <b>Q2</b> from <b>I</b> and for each second quantization factor <b>q2</b> select the rigth trained model to predict the first quantization factor <b>q1</b>. The method is built with an ensable of 2 network trained with different items which calculate the averages of softmax to choose the <b>q1</b> predicted.
+
+IMPORTANT: the models were trained through items with a maximum value of 22 between the first 15 quantization factors <b>q1</b> and then the prediction will give always values between 1 and 22. To test the same method with higher values you need to re-train the models. If you want to re-train the models please contact one of the author to ask the right code for training. 
 
 128_128.jpg: 128X128 image compressed with QF1=60 e QF2=90
 
@@ -61,7 +61,7 @@ employing a constant matrix for each value between 1 and <b>max</b> (set inside 
 
 The JPEG files (128_128.jpg and 4288_2848.jpg) have the first 15 quantization factors (in zig-zag order) equal to [13, 9, 10, 11, 10, 8, 13, 11, 10, 11, 14, 14, 13, 15, 19]
 
-v1.py: python file to predict the quantization factor (function get_coefficients_first_compression in the main).
+cnn_v1.py: python file to predict the quantization factor (function get_coefficients_first_compression in the main).
 
 jpeg: executable file for DCT values extraction from file (without IDCT); it needs the executable permissions.
 
@@ -74,19 +74,22 @@ We tested our codes on Python 2.7 and Python 3 under Ubuntu 16.04 and 18.04 (64 
 
 The libraries needed to execute the code are:
 ```
-sys
 numpy
 PIL
+sys
+import os
 subprocess
-os
+sklearn 
+keras
+tensorflow
 ```
 
 
 
 To try our software, execute:
 ```
-python3 -v1.py
-python -v1.py
+python3 cnn_v1.py
+python cnn_v1.py
 ```
 
 
