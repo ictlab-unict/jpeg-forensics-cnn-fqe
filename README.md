@@ -6,9 +6,9 @@
 </div>
 <br><br>
 
-<h1  style="font-family: Arial;  font-size: 40px;"><b>Computational data analysis for first quantization estimation on JPEG double compressed images</b></h1>
+<h1  style="font-family: Arial;  font-size: 40px;"><b>CNN-based first quantization estimation of double compressed JPEG images</b></h1>
 
-<div style="font-size:15px; color:black"><b><a href="https://www.micc.unifi.it/icpr2020/" target="_blank">In Proceedings of the International Conference on Pattern Recognition</a></b></div>
+<div style="font-size:15px; color:black"><b><a href="https://www.sciencedirect.com/journal/journal-of-visual-communication-and-image-representation" target="_blank">Journal of Visual Communication and Image Representation 2022</a></b></div>
 <br>
 
 <div style="font-size:15px; color:black"><b>Sebastiano Battiato<sup>1,2</sup>, Oliver Giudice<sup>2,3</sup>, Francesco Guarnera<sup>1,2</sup>, Giovanni Puglisi<sup>4</sup></b></div>
@@ -24,17 +24,17 @@
 <div style="text-align: center; background-color: cornsilk; border-radius: 10px;margin-left: 20%;margin-right: 20%;width: 60%">
 
 <center>
-<a href="https://ieeexplore.ieee.org/document/9412528"><font size="5px" ><b>DOWNLOAD PAPER</b></font></a>
+<a href="https://www.sciencedirect.com/science/article/pii/S1047320322001559"><font size="5px" ><b>DOWNLOAD PAPER</b></font></a>
 </center>
 <br><br>
 <div style="text-align:left !important;margin-left:20%">
-	@article{battiato2021computational,<br>
-<span style="margin-left: 2%">title={Computational data analysis for first quantization estimation on JPEG double compressed images},</span><br>
+	@article{battiato2022cnn,<br>
+<span style="margin-left: 2%">title={CNN-based first quantization estimation of double compressed JPEG images},</span><br>
 <span style="margin-left: 2%">author={Battiato, Sebastiano and Giudice, Oliver and Guarnera, Francesco and Puglisi, Giovanni},</span><br>
-<span style="margin-left: 2%">booktitle={2020 25th International Conference on Pattern Recognition (ICPR)},</span><br>
-<span style="margin-left: 2%">pages={5951--5958}</span><br>
-<span style="margin-left: 2%">year={2021}</span><br>
-<span style="margin-left: 2%">organization = {IEEE}</span><br>
+<span style="margin-left: 2%">journal={Journal of Visual Communication and Image Representation},</span><br>
+<span style="margin-left: 2%">pages={103635}</span><br>
+<span style="margin-left: 2%">year={2022}</span><br>
+
 	}
 </div>
 
