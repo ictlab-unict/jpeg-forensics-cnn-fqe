@@ -19,12 +19,14 @@ from keras.layers import Dense, Conv2D, Flatten,Dropout, BatchNormalization, Act
 from keras.regularizers import l2
 from keras.callbacks import LearningRateScheduler
 from tensorflow import keras
+import argparse
 
 
 
 def get_dct_coeffs_distribution(path,width,height):
-    #leggo valori DCT dal file (senza aprire l'immagine ed evitando l'errore di truncation)
-    #restituisce le 64 distribuzioni scorrendo colonna per colonna (1,1),(2,1)......(8,1),(2,1),(2,2)
+    #reading DCT values from file (without image opening to avoid truncation error)
+    #returns 64 distributions column by column (1,1),(2,1)......(8,1),(2,1),(2,2)
+    #everything is done with jpeg compressor/decompressor provided
     p = subprocess.Popen(["./jpeg " + path],
                          stdout=subprocess.PIPE,
                          stderr=subprocess.PIPE, shell=True)
@@ -36,13 +38,13 @@ def get_dct_coeffs_distribution(path,width,height):
     coefficents = np.array(out.splitlines()).astype('int')
 
 
-    #ottengo larghezza e altezza massima dei blocchi 8X8
+    # maximum width and eight of 8x8 blocks  
     while (width%8) !=0:
         width-=1
     while (height%8) !=0:
         height-=1
 
-    #ottengo le distribuzioni dei 64 coefficienti
+    # obtaining distributions
     distributions = np.zeros((int(width*height/64), 64))
     n_dist=0
 
@@ -57,7 +59,7 @@ def get_dct_coeffs_distribution(path,width,height):
 
 
 def coeff_to_zigzag_index(coeff):
-    #ordinamento colonna per colonna
+    # jpeg-like zigzag ordering
     map=[]
     map.append(0)
     map.append(8)
@@ -77,13 +79,25 @@ def coeff_to_zigzag_index(coeff):
 
     return map[coeff]
 
+def is_valid_file(parser, arg):
+    if not os.path.exists(arg):
+        parser.error("The file %s does not exist!" % arg)
+    else:
+        return arg
+
 
 if __name__ == '__main__':
+    parser = argparse.ArgumentParser(description='Estimating first quantization with CNN.')
+    parser.add_argument("-i", dest="filename", required=True,
+        help="input JPEG file", type=lambda x: is_valid_file(parser, x))
+    parser.add_argument("-n", dest="max_coeff", default=22, required=False,
+        help="max coefficient expected between first 15 coeffs")
+    args = parser.parse_args()
 
-    img = '128_128.jpg'
-    # img='4288_2848.jpg'
-    number_nets = 2
+    #img = '128_128.jpg'
+    number_nets = 2 # one for AC and different one for DC coeffients
 
+    # loading pre-trained models
     AC_nets_mixed = {}
     DC_nets_mixed = {}
     for q2 in range(1, 23):
@@ -98,52 +112,51 @@ if __name__ == '__main__':
 
 
 
-    # apro il file e ne estraggo le dimensioni e l'ultima tabella di quantizzazione
+    # opening image file and extracting info (dim and readable quantization table from JPEG)
+    img = args.filename
+    maximum_q2 = args.max_coeff
+
     _img = Image.open(img)
-    # tabella di quantizzazione in zig-zag order
     Q2 = _img.quantization[0]
     width, height = _img.size
     _img.close()
     coeffs_distribution = get_dct_coeffs_distribution(img, width, height)
 
-    # massimo q2 presente sul training set
-    maximum_q2 = 22
-
-
-    # preparo le strutture dati per le distribuzioni, una per ogni q2
+    # preparing structures for distributions, one for each Q2
     distributions = {}
     for q2 in range(1, maximum_q2 + 1):
         distributions[q2] = []
 
-    # range per la generazione degli istogrammi
+    # generating histograms
     _range = np.array(range(0, 1026)) - 0.5
 
-    # per i primi 15 coeff
+    # estimating first 15 coeffs
     for coeff in range(0, 15):
-        # indice coefficiente
+        # coeff index
         dct_coeff = coeff + 1
 
-        # ottengo l'indice in ordinamento zigzag
+        # zigzag ordering index
         zig_zag_coeff = coeff_to_zigzag_index(coeff)
 
-        # ed il relativo q2 (utilizzo coeff come index perche Q2 e gia in zig-zag order)
+        # and corresponding Q2 
         q2 = Q2[coeff]
 
-        # moltiplico per le distribuzioni (simulando la IDCT ed ottenere i valori dul dominio spaziale senza errore di truncate)
+        # coeff multiplication (aka simulating the inverseDCT in order to obtain spatial values without truncating error)
         data = coeffs_distribution[:, zig_zag_coeff]
         data = data * q2
 
-        # genero istogrammi associati ai coefficenti con valore assoluto
+        # histogram generation with corresponding coeffs (abs)
         data = np.absolute(data)
         hist, _ = np.histogram(data, _range)
 
         hist = hist.astype(float)
 
-        # aggiungo il DCT analizzato come primo valore
+        # adding DCT value as first value
         hist = np.insert(hist, 0, dct_coeff)
 
         distributions[q2].append(hist)
 
+    # actual prediction step
     predictions=np.zeros(15)
     for q2 in range(1, 23):
         if(len(distributions[q2])>0):
@@ -173,7 +186,6 @@ if __name__ == '__main__':
                 q1_predicted = np.argmax(mean_softmax) + 1
                 predictions[dct_coeff_query - 1] = q1_predicted
     print(predictions)
-    sys.exit(0)
 
 
 
