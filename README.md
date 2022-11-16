@@ -72,27 +72,11 @@ We tested our codes on Python 2.7 and Python 3 under Ubuntu 16.04 and 18.04 (64 
 
 ## Try the code
 
-The libraries needed to execute the code are:
+Just launch the installation of requirements.txt and then execute:
+
 ```
-numpy
-PIL
-sys
-import os
-subprocess
-sklearn 
-keras
-tensorflow
+python cnn_v1.py -i image_name.jpg
 ```
-
-
-
-To try our software, execute:
-```
-python3 cnn_v1.py
-python cnn_v1.py
-```
-
-
 
 
 
